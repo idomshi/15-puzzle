@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>15 pazzle</title>
-    <script src="https://unpkg.com/vue@3.2.37"></script>
+    <title>15 puzzle</title>
+    <script src="https://unpkg.com/vue@3.2.37/dist/vue.global.js"></script>
     <style>
         .piece-container {
             width: 720px;
@@ -41,36 +41,55 @@
         .piece15 { background-position: -541px -541px; background: none; z-index: -1; }
 
         .button {
+            width: 720px;
             background-color:rgb(179, 200, 134);
             padding: 2rem;
             display: flex;
             justify-content: center;
             align-items: center;
+            box-sizing: border-box;
         }
 
         .piece-group-move {
             transition: transform 0.1s ease-in;
         }
+
+        /* ↑ここにCSSを書く。 */
     </style>
 </head>
 <body>
     <div id="app">
         <transition-group name="piece-group" tag="div" class="piece-container">
-            <div v-for="(id, i) in arr" class="piece" :class="[generateClassname(id)]" :key="id" @click="slide(i)"></div>
+            <div class="piece" v-for="(id, i) in arr" :key="id" :class="[generateClassname(id)]" @click="slide(i)"></div>
         </transition-group>
         <p @click="shuffle" class="button">シャッフル</p>
+
+        <!-- ↑ここに表示するものを書く。 -->
     </div>
     
     <script>
-        const app = {
+        const App = {
             setup() {
+                const arr = Vue.ref([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+                const generateClassname = (id) => 'piece' + String(id).padStart(2, '0')
+
+                const shuffle = () => {
+                    const tmp = [...arr.value]
+                    for (let i = tmp.length - 1; i > 0; i--) {
+                        const r = Math.floor(Math.random() * (i + 1))
+                        const t = tmp[i]
+                        tmp[i] = tmp[r]
+                        tmp[r] = t
+                    }
+                    arr.value = tmp
+                }
+
                 const slideX = (from, to) => {
                     const tmp = [...arr.value]
                     const [t] = tmp.splice(to, 1)
                     tmp.splice(from, 0, t)
                     arr.value = tmp
                 }
-
 
                 const slideD = (from, to) => {
                     const tmp = [...arr.value]
@@ -106,31 +125,19 @@
                         }
                     }
                 }
-
-                const shuffle = () => {
-                    const tmp = [...arr.value]
-                    for (let i = tmp.length - 1; i > 0; i--) {
-                        const r = Math.floor(Math.random() * (i + 1))
-                        const t = tmp[i]
-                        tmp[i] = tmp[r]
-                        tmp[r] = t
-                    }
-                    arr.value = tmp
-                }
-                const generateClassname = (id) => 'piece' + String(id).padStart(2, '0')
-                const arr = Vue.ref([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
-
-
+                
                 return {
                     arr,
                     generateClassname,
                     shuffle,
                     slide,
                 }
+
+                // ↑ここにJavaScriptを書く。
             },
         } 
 
-        Vue.createApp(app).mount('#app')
+        Vue.createApp(App).mount('#app')
     </script>
 </body>
 </html>
